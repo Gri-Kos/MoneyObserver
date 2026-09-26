@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load filters %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'table_page.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'font.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-size: 1.1rem;
+        }
+
+        .custom-navbar {
+            background-color: #343a40;
+        }
+
+        .custom-navbar .nav-link {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .custom-navbar .nav-link.active {
+            font-weight: bold;
+            background-color: #495057; /* Фон активной вкладки */
+            border-radius: 5px;
+        }
+
+        .btn-small {
+            font-size: 1rem;
+        }
+
+        .alert {
+            font-size: 1.1rem;
+            transition: opacity 1s ease-out;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+    </style>
+    <title>Траты</title>
+</head>
+<body>
+<nav class="navbar custom-navbar navbar-dark py-3">
+    <div class="container-fluid">
+        <a class="nav-link px-4 py-2" href="{% url 'savings_list' %}">Сбережения</a>
+        <a class="nav-link active px-4 py-2" href="{% url 'expenses_list' %}">Траты</a>
+        <a class="nav-link px-4 py-2" href="{% url 'incomes_list' %}">Доходы</a>
+        <a class="nav-link px-4 py-2" href="{% url 'plans' %}">Планы</a>
+        <a class="nav-link px-4 py-2" href="{% url 'analytics' %}">Анализ</a>
+        <span class="nav-link font-weight-bold mx-auto text-center">Вы находитесь в: {{ table }}</span>
+        <button class="btn btn-danger btn-small ml-auto">
+            <a class="text-white text-decoration-none" href="{% url 'main_page' %}">На главную</a>
+        </button>
+    </div>
+</nav>
+
+
+<div class="container mt-5">
+    {% if messages %}
+    <div class="alert alert-warning" id="alertMessage">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+    <button class="btn btn-success btn-small montserrat" data-toggle="modal" data-target="#addTransactionModal">+ Добавить трату</button>
+    </div>
+
+    <table class="table mt-4 montserrat">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Тип</th>
+            <th scope="col">Сумма</th>
+            <th scope="col">Дата</th>
+            <th scope="col">Сбережение</th>
+            <th scope="col">Название</th>
+            <th scope="col">Анализ</th>
+            <th scope="col">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in transactions %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ transaction.type }}</td>
+            <td>{{ transaction.price|dynamic_float }}</td>
+            <td>{{ transaction.date }}</td>
+            <td>{{ transaction.saving }}</td>
+            <td>{{ transaction.name }}</td>
+            {% if transaction.analytics %}
+            <td> Да </td>
+            {% else %}
+            <td> Нет </td>
+            {% endif %}
+            <td>
+                <a href="{% url 'delete_transaction' transaction.id %}" class="btn btn-danger btn-sm m-2">Удалить</a>
+                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editTransactionModal{{ transaction.id }}">
+                    Обновить
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Модальное окно для добавления транзакции -->
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'add_transaction' 'Expense' %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTransactionModalLabel">Добавить трату</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Тип</label>
+                            <select id="type" name="type" class="form-select" required>
+                                {% for plan in plans %}
+                                <option value="{{ plan.name }}">{{ plan.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Сумма</label>
+                            <input type="number" id="price" name="price" class="form-control" step="0.0001" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Дата</label>
+                            <input type="date" id="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="saving" class="form-label">Сбережение</label>
+                            <select id="saving" name="saving" class="form-select" required>
+                                {% for saving in savings %}
+                                <option value="{{ saving.name }}">{{ saving.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Название</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        <!-- Скрытое поле для значения 'False' -->
+                        <input type="hidden" name="analytics" value="0">
+
+                        <!-- Чекбокс для "Использовать в аналитике?" -->
+                        <div class="mb-3">
+                            <label for="analytics" class="form-label">Использовать в аналитике?</label>
+                            <input type="checkbox" id="analytics" name="analytics" value="1" >
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования транзакции -->
+    {% for transaction in transactions %}
+    <div class="modal fade" id="editTransactionModal{{ transaction.id }}" tabindex="-1" aria-labelledby="editTransactionModalLabel{{ transaction.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'edit_transaction' transaction.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editTransactionModalLabel{{ transaction.id }}">Редактировать трату</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="expenseName{{ transaction.id }}" class="form-label">Название</label>
+                            <input type="text" class="form-control" id="expenseName{{ transaction.id }}" name="name" value="{{ transaction.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expenseType{{ transaction.id }}" class="form-label">Тип</label>
+                            <select class="form-select" id="expenseType{{ transaction.id }}" name="type" required>
+                                {% for plan in plans %}
+                                <option value="{{ plan.name }}" {% if plan.name == transaction.type %}selected{% endif %}>{{ plan.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expensePrice{{ transaction.id }}" class="form-label">Сумма</label>
+                            <input type="number" class="form-control" id="expensePrice{{ transaction.id }}" name="price" value="{{ transaction.price|dynamic_float }}" step="0.0001" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expenseDate{{ transaction.id }}" class="form-label">Дата</label>
+                            <input type="date" class="form-control" id="expenseDate{{ transaction.id }}" name="date" value="{{ transaction.date|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expenseSaving{{ transaction.id }}" class="form-label">Сбережение</label>
+                            <select class="form-select" id="expenseSaving{{ transaction.id }}" name="saving" required>
+                                {% for saving in savings %}
+                                <option value="{{ saving.name }}" {% if saving.name == transaction.saving %}selected{% endif %}>{{ saving.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Скрытое поле для значения 'False' -->
+                        <input type="hidden" name="analytics" value="0">
+
+                        <!-- Чекбокс для "Использовать в аналитике?" -->
+                        <div class="mb-3">
+                            <label for="analytics" class="form-label">Использовать в аналитике?</label>
+                            <input type="checkbox" id="analytics" name="analytics" value="1" {% if transaction.analytics %}checked{% endif %}>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary">Обновить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    // Удаление уведомления через 2 секунды
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#alertMessage').fadeOut('slow');
+        }, 2000);
+    });
+</script>
+</body>
+</html>

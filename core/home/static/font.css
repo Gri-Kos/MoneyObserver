@@ -1,0 +1,13 @@
+/* Создаем класс чтобы использовать шрифт Montserrat и задаем 2 вида шрифта – полужирный и жирный */
+
+.montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.semibold {
+    font-weight: 600;
+}
+
+.bold {
+    font-weight: 700;
+}

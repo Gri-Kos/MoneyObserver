@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    {% load filters %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'table_page.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'font.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-size: 1.1rem;
+        }
+
+        .custom-navbar {
+            background-color: #343a40;
+        }
+
+        .custom-navbar .nav-link {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .custom-navbar .nav-link.active {
+            font-weight: bold;
+            background-color: #495057; /* Фон активной вкладки */
+            border-radius: 5px;
+        }
+
+        .btn-small {
+            font-size: 1rem;
+        }
+
+        .alert {
+            font-size: 1.1rem;
+            transition: opacity 1s ease-out;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+    </style>
+    <title>Анализ</title>
+</head>
+<body>
+<nav class="navbar custom-navbar navbar-dark py-3">
+    <div class="container-fluid">
+        <a class="nav-link px-4 py-2" href="{% url 'savings_list' %}">Сбережения</a>
+        <a class="nav-link px-4 py-2" href="{% url 'expenses_list' %}">Траты</a>
+        <a class="nav-link px-4 py-2" href="{% url 'incomes_list' %}">Доходы</a>
+        <a class="nav-link px-4 py-2" href="{% url 'plans' %}">Планы</a>
+        <a class="nav-link active px-4 py-2" href="{% url 'analytics' %}">Анализ</a>
+        <span class="nav-link font-weight-bold mx-auto text-center">Вы находитесь в: {{ table }}</span>
+        <button class="btn btn-danger btn-small ml-auto">
+            <a class="text-white text-decoration-none" href="{% url 'main_page' %}">На главную</a>
+        </button>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Анализ доходов</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Максимальный доход</th>
+            <th>Минимальный доход</th>
+            <th>Средний доход</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                {% if income_analysis.max.price__max is not None %}
+                    {{ income_analysis.max.price__max|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if income_analysis.min.price__min is not None %}
+                    {{ income_analysis.min.price__min|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if income_analysis.avg.price__avg is not None %}
+                    {{ income_analysis.avg.price__avg|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mb-4">Анализ расходов</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Максимальный расход</th>
+            <th>Минимальный расход</th>
+            <th>Средний расход</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                {% if expense_analysis.max.price__max is not None %}
+                    {{ expense_analysis.max.price__max|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if expense_analysis.min.price__min is not None %}
+                    {{ expense_analysis.min.price__min|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if expense_analysis.avg.price__avg is not None %}
+                    {{ expense_analysis.avg.price__avg|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mb-4">Анализ по ожиданиям</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Ожидаемый доход</th>
+            <th>Ожидаемый расход</th>
+            <th>Ожидаемая динамика</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                {% if expectation_analysis.expected_income.expected_sum__sum is not None %}
+                    {{ expectation_analysis.expected_income.expected_sum__sum|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if expectation_analysis.expected_expense.expected_sum__sum is not None %}
+                    {{ expectation_analysis.expected_expense.expected_sum__sum|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if expectation_analysis.expected_diff is not None %}
+                    {{ expectation_analysis.expected_diff|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mb-4">Анализ по данным</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Реальный доход</th>
+            <th>Реальный расход</th>
+            <th>Реальная динамика</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                {% if reality_income is not None %}
+                    {{ reality_income|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if reality_expense is not None %}
+                    {{ reality_expense|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+            <td>
+                {% if expectation_analysis.reality_diff is not None %}
+                    {{ expectation_analysis.reality_diff|dynamic_float }}
+                {% else %}
+                    Недостаточно данных
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="mt-5">Графики</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% if income_pie %}
+                <img src="{{ income_pie }}" alt="Income Pie Chart" class="img-fluid" style="margin-bottom:2rem">
+            {% else %}
+                <p>Недостаточно данных для построения графика доходов</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            {% if expense_pie %}
+                <img src="{{ expense_pie }}" alt="Expense Pie Chart" class="img-fluid" style="margin-bottom:2rem">
+            {% else %}
+                <p>Недостаточно данных для построения графика расходов</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

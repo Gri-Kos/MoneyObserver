@@ -1,0 +1,71 @@
+body { /* Фон, градиентная анимация, расположение элементов */
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #28a745, #34d0d0);
+    background-size: 400% 400%;
+    animation: waveAnimation 10s ease-in-out infinite;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-display: swap;
+}
+
+@keyframes waveAnimation { /* Параметры анимации */
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.container { /* Внешний вид формы */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Параметры поля для ввода с паролем (вид, скрывающий глаз) */
+.password-container {
+    position: relative;
+}
+
+.password-field {
+    padding-right: 2.5rem;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.toggle-password.hidden {
+    visibility: hidden;
+}
+
+.toggle-password:hover {
+    color: #007bff;
+}
+
+/* Внешний вид поля ввода */
+.form-control {
+    background-color: #f1f8e9;
+    border-radius: 0.5rem;
+}
+
+/* Поведение кнопок */
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}

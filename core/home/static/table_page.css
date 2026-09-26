@@ -1,0 +1,89 @@
+/*настраивает фон страницы и таблицу*/
+
+.custom-width {
+    max-width: 70% !important;
+}
+
+body {
+    background-color: #87CEEB !important; /* Небесно-голубой цвет */
+}
+
+.ok {
+color: white;
+text-decoration: none;
+}
+
+.ok:hover {
+color: white;
+text-decoration: none;
+}
+
+.modal-header {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.class {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.btn-success {
+    white-space: nowrap;
+}
+
+.modal-header .btn-close.custom-close {
+    background: none;
+    border: none;
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    line-height: 1;
+    opacity: 1;
+    transition: color 0.3s ease;
+}
+
+.modal-header .btn-close.custom-close:hover {
+    color: #db636b !important;
+}
+
+table {
+    background-color: white;
+    border-collapse: collapse;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+tr:hover {
+    background-color: #e9ecef;
+}
+
+table, th, td {
+    border: 1px solid #dee2e6;
+}
+
+thead th, tbody td {
+    border-right: 1px solid #dee2e6;
+}
+
+thead th:last-child, tbody td:last-child {
+    border-right: none;
+}
